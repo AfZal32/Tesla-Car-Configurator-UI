@@ -14,14 +14,17 @@ const accessoryCheckboxes = document.querySelectorAll(
 );
 const downPaymentElement = document.querySelector("#down-payment");
 const monthlyPaymentElement = document.querySelector("#monthly-payment");
-const buttonSubmit = document.querySelector(".button-submit");
-const modalSubmit = document.querySelector(".modal-submit");
+
+const modalSubmit = document.querySelector("#modal-submit");
 const priceModal = document.querySelector("#price");
-const itemsModal = document.querySelector(".modal-items");
-const buttonConfirmModal = document.querySelector("#handleSubmit");
 const modalTitle = document.querySelector("#modal-title");
-const modalMessage = document.querySelector(".modal-message"); // Assuming you add a class here for the message section
-const modalActions = document.querySelector(".modal-actions");
+const modalMessage = document.querySelector("#modal-message");
+const modalActions = document.querySelector("#modal-actions");
+const modalOuterDiv = document.querySelector("#modal-background");
+const modalContentDiv = document.querySelector(
+  "#modal-submit #modal-items-div"
+);
+
 const basePrice = 52490;
 let currentPrice = basePrice;
 
@@ -80,7 +83,6 @@ const updateTotalPrice = () => {
 
   // Update the total price in UI
   totalPriceElement.textContent = `$${currentPrice.toLocaleString()}`;
-
   updatePaymentBreakdown();
 };
 
@@ -182,12 +184,10 @@ const handleWheelButtonClick = (event) => {
 
     // Add selected styles to clicked button
     event.target.classList.add("bg-gray-700", "text-white");
-
     selectedOptions["Performance Wheels"] =
       event.target.textContent.includes("Performance");
 
     updateExteriorImage();
-
     updateTotalPrice();
   }
 };
@@ -213,13 +213,13 @@ const fullSelfDrivingChange = () => {
 accessoryCheckboxes.forEach((checkbox) => {
   checkbox.addEventListener("change", () => updateTotalPrice());
 });
+
 // Initial Update Total Price
 updateTotalPrice();
 
 // Handle submit
-
 const handleSubmit = () => {
-  priceModal.innerHTML = `Price: $${currentPrice}`;
+  priceModal.innerHTML = ` $${currentPrice}`;
 
   // Add classes for entering transition
   modalSubmit.classList.remove("invisible", "opacity-0", "scale-95");
@@ -232,9 +232,8 @@ const handleSubmit = () => {
 };
 
 // Handle modal cancel
-const cancelModal = () => {
+const cancelModal = (event) => {
   // Add classes for leaving transition
-  // itemsModal.classList.add("visible");
   modalSubmit.classList.add("opacity-0", "scale-95", "ease-in", "duration-100");
   modalSubmit.classList.remove("opacity-100", "scale-100");
   setTimeout(() => {
@@ -247,14 +246,14 @@ const modalSaveHandler = () => {
   modalTitle.innerText = "Order Confirmed";
   modalMessage.innerHTML =
     "<p>Your Tesla Model Y order has been confirmed!</p>";
-  priceModal.innerHTML = ""; // Clear the price, if needed
+  priceModal.innerHTML = ` $${currentPrice}`;
 
   // Update the buttons to show "OK" instead of "Yes" and "No"
   modalActions.innerHTML = `
   <button
     onclick="closeModal()"
     type="button"
-    class="mt-3 inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:mt-0 sm:w-auto"
+    class="inline-flex w-full justify-center rounded-md px-3 py-2 text-xl hover:text-white shadow-sm bg-gray-400 hover:bg-gray-600 hover:text-white rounded-lg transition-colors duration-300 sm:ml-3 sm:w-auto"
   >
     OK
   </button>
@@ -273,5 +272,7 @@ interiorColorSection.addEventListener("click", handleColorButtonClick);
 wheelButtonsSection.addEventListener("click", handleWheelButtonClick);
 performanceBtn.addEventListener("click", handlePerformanceButtonClick);
 fullSelfDrivingCheckbox.addEventListener("change", fullSelfDrivingChange);
-// modalSubmit.addEventListener("click", cancelModal);
-buttonConfirmModal.addEventListener("click", modalSaveHandler);
+modalContentDiv.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
+modalOuterDiv.addEventListener("click", cancelModal);
